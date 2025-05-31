@@ -1,5 +1,5 @@
 {
-  "name": "@watanabe-baketsu/slack-mcp-server",
+  "name": "@get-insert/slack-mcp-server",
   "version": "0.0.4",
   "description": "A Slack MCP server",
   "main": "dist/index.js",

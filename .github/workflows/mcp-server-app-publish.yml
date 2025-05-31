@@ -1,4 +1,4 @@
-name: Publish Package
+name: MCP Server Application Publish
 
 on:
   release:
@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@watanabe-baketsu'
+          scope: '@get-insert'
           cache: 'npm'
       
       - name: Install dependencies
