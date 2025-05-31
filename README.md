@@ -111,6 +111,58 @@ For example, the `slack_list_channels` implementation parses the request with `L
 
 ## Development
 
+### Prerequisites
+
+#### AWS SAM CLI Installation
+
+AWS SAM CLI installation is required for setting up the development environment. Please follow the documentation below for installation:
+
+[AWS SAM CLI Installation Guide](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/install-sam-cli.html)
+
+**For macOS:**
+
+You can install using the GUI installer:
+
+```bash
+# For x86_64 architecture
+curl -L https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-macos-x86_64.pkg -o aws-sam-cli-macos-x86_64.pkg
+# After download, double-click the .pkg file to install via GUI
+# Or install via command line:
+sudo installer -pkg aws-sam-cli-macos-x86_64.pkg -target /
+
+# For arm64 (Apple Silicon) architecture
+curl -L https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-macos-arm64.pkg -o aws-sam-cli-macos-arm64.pkg
+# After download, double-click the .pkg file to install via GUI
+# Or install via command line:
+sudo installer -pkg aws-sam-cli-macos-arm64.pkg -target /
+```
+
+**For Linux:**
+```bash
+# For x86_64 architecture
+wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
+unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
+sudo ./sam-installation/install
+
+# For arm64 architecture
+wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-arm64.zip
+unzip aws-sam-cli-linux-arm64.zip -d sam-installation
+sudo ./sam-installation/install
+```
+
+**For Windows:**
+
+You can install using the GUI installer (MSI):
+
+1. Download [AWS SAM CLI 64-bit](https://github.com/aws/aws-sam-cli/releases/latest/download/AWS_SAM_CLI_64_PY3.msi)
+2. Double-click the downloaded MSI file and follow the GUI installer instructions
+3. After installation, open a new Command Prompt or PowerShell to verify
+
+After installation, verify that it was installed correctly with the following command:
+```bash
+sam --version
+```
+
 ### Available Scripts
 
 - `npm run dev` - Start the server in development mode with hot reloading
