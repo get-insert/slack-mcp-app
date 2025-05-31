@@ -119,49 +119,42 @@ AWS SAM CLI installation is required for setting up the development environment.
 
 [AWS SAM CLI Installation Guide](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/install-sam-cli.html)
 
-**For macOS:**
+#### Build & local debug
 
-You can install using the GUI installer:
+To build and debug the server locally using AWS SAM CLI:
 
+1. Build the project:
 ```bash
-# For x86_64 architecture
-curl -L https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-macos-x86_64.pkg -o aws-sam-cli-macos-x86_64.pkg
-# After download, double-click the .pkg file to install via GUI
-# Or install via command line:
-sudo installer -pkg aws-sam-cli-macos-x86_64.pkg -target /
-
-# For arm64 (Apple Silicon) architecture
-curl -L https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-macos-arm64.pkg -o aws-sam-cli-macos-arm64.pkg
-# After download, double-click the .pkg file to install via GUI
-# Or install via command line:
-sudo installer -pkg aws-sam-cli-macos-arm64.pkg -target /
+sam build
 ```
 
-**For Linux:**
+2. Start the local API:
 ```bash
-# For x86_64 architecture
-wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
-unzip aws-sam-cli-linux-x86_64.zip -d sam-installation
-sudo ./sam-installation/install
-
-# For arm64 architecture
-wget https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-arm64.zip
-unzip aws-sam-cli-linux-arm64.zip -d sam-installation
-sudo ./sam-installation/install
+sam local start-api
 ```
 
-**For Windows:**
+The server will be available at `http://localhost:3000`.
 
-You can install using the GUI installer (MSI):
+#### Deploy to AWS
 
-1. Download [AWS SAM CLI 64-bit](https://github.com/aws/aws-sam-cli/releases/latest/download/AWS_SAM_CLI_64_PY3.msi)
-2. Double-click the downloaded MSI file and follow the GUI installer instructions
-3. After installation, open a new Command Prompt or PowerShell to verify
+You can also deploy to AWS environment for quick testing using SAM CLI:
 
-After installation, verify that it was installed correctly with the following command:
+1. Deploy with guided setup (first time):
 ```bash
-sam --version
+sam deploy --guided
 ```
+
+2. Deploy with existing configuration:
+```bash
+sam deploy
+```
+
+3. Delete the deployed stack when no longer needed:
+```bash
+sam delete
+```
+
+Note: Make sure to configure your AWS credentials and region before deployment. The deployed API Gateway endpoint will be displayed after successful deployment.
 
 ### Available Scripts
 
