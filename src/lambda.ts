@@ -210,12 +210,16 @@ export const handler = async (
       reject(new Error('Serverless express instance not initialized'));
       return;
     }
-    serverlessExpressInstance(event, context, (error: any, result: any) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(result);
+    serverlessExpressInstance(
+      event,
+      context,
+      (error: unknown, result: unknown) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result as APIGatewayProxyResult);
+        }
       }
-    });
+    );
   });
 };
