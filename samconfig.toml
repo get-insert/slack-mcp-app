@@ -19,6 +19,7 @@ resolve_s3 = true
 s3_prefix = "slack-mcp"
 region = "ap-northeast-1"
 image_repositories = []
+parameter_overrides = "SlackClientId=xoxb-test-client-id SlackClientSecret=test-client-secret-value SlackSigningSecret=test-signing-secret-value"
 
 [default.package.parameters]
 resolve_s3 = true
