@@ -192,7 +192,7 @@ function createExpressApp(): express.Application {
   console.log('Creating MCP server');
   const server = createMCPServer();
   console.log('MCP server created successfully');
-  
+
   console.log('Creating transport manager');
   const transportManager = new TransportManager(server);
   console.log('Transport manager created successfully');
@@ -210,7 +210,7 @@ export const handler = async (
 ): Promise<APIGatewayProxyResult> => {
   console.log('Lambda handler started');
   console.log('Event:', JSON.stringify(event, null, 2));
-  
+
   try {
     if (!serverlessExpressInstance) {
       console.log('Creating new Express app instance');
@@ -235,7 +235,10 @@ export const handler = async (
             console.error('Serverless express execution error:', error);
             reject(error);
           } else {
-            console.log('Request processed successfully, result:', JSON.stringify(result, null, 2));
+            console.log(
+              'Request processed successfully, result:',
+              JSON.stringify(result, null, 2)
+            );
             resolve(result as APIGatewayProxyResult);
           }
         }
