@@ -32,7 +32,7 @@ jobs:
         - run: sam build --use-container
         - run: |
             sam deploy \
-              --stack-name slack-mcp-test \
+              --stack-name slack-mcp \
               --region ${{ env.AWS_REGION }} \
               --capabilities CAPABILITY_IAM \
               --no-confirm-changeset \
