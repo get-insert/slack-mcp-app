@@ -1,3 +1,5 @@
+name: MCP Server Deploy
+
 on:
     push:
       branches:
@@ -28,4 +30,14 @@ jobs:
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: ${{ env.AWS_REGION }}
         - run: sam build --use-container
-        - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+        - run: |
+            sam deploy \
+              --stack-name slack-mcp \
+              --region ${{ env.AWS_REGION }} \
+              --capabilities CAPABILITY_IAM \
+              --no-confirm-changeset \
+              --no-fail-on-empty-changeset \
+              --parameter-overrides \
+                ParameterKey=SlackClientId,ParameterValue=xoxb-test-client-id \
+                ParameterKey=SlackClientSecret,ParameterValue=test-client-secret-value \
+                ParameterKey=SlackSigningSecret,ParameterValue=test-signing-secret-value
