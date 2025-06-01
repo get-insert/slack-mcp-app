@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist-lambda",
+    "rootDir": "./src",
+    "module": "CommonJS",
+    "target": "es2020",
+    "moduleResolution": "node"
+  },
+  "include": ["src/lambda-entry.ts", "src/handlers/**/*", "src/schemas.ts", "src/config/**/*", "src/server/**/*", "src/domain/**/*", "src/infrastructure/**/*", "src/interfaces/**/*", "src/usecases/**/*"],
+  "exclude": ["node_modules", "dist", "examples", "src/index.ts"]
+}

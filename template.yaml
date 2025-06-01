@@ -23,7 +23,7 @@ Resources:
   SlackMCPServerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: dist/lambda.handler
+      Handler: dist-lambda/lambda-entry.handler
       Runtime: nodejs20.x
       Architectures:
         - x86_64
