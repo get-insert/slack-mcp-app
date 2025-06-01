@@ -2,7 +2,7 @@ name: SAM CI
 
 on:
   push:
-    branches: [ main, feat/sam-and-samcicd ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
