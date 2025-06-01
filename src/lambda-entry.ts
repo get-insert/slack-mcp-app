@@ -6,15 +6,15 @@ import {
 import { configure } from '@codegenie/serverless-express';
 import express from 'express';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { TransportManager } from './server/transport';
-import { setupRoutes } from './server/routes';
+import { TransportManager } from './server/transport.js';
+import { setupRoutes } from './server/routes.js';
 import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { z } from 'zod';
-import { handlers } from './handlers/index';
+import { handlers } from './handlers/index.js';
 import {
   ListChannelsRequestSchema,
   PostMessageRequestSchema,
@@ -34,7 +34,7 @@ import {
   GetCanvasContentRequestSchema,
   SummarizeUserCanvasesRequestSchema,
   GetUserChannelActivityRequestSchema,
-} from './schemas';
+} from './schemas.js';
 
 let serverlessExpressInstance: ReturnType<typeof configure> | undefined;
 
