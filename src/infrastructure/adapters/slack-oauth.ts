@@ -10,14 +10,18 @@ export class SlackOAuthAdapter implements ISlackOAuthPort {
   ) {}
 
   async exchangeCode(code: string): Promise<{ installation: Installation }> {
-    const resp = await axios.post('https://slack.com/api/oauth.v2.access', null, {
-      params: {
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        code,
-        redirect_uri: this.redirectUri,
+    const resp = await axios.post(
+      'https://slack.com/api/oauth.v2.access',
+      null,
+      {
+        params: {
+          client_id: this.clientId,
+          client_secret: this.clientSecret,
+          code,
+          redirect_uri: this.redirectUri,
+        },
       }
-    });
+    );
     if (!resp.data.ok) throw new Error(resp.data.error);
 
     const data = resp.data;
@@ -25,16 +29,20 @@ export class SlackOAuthAdapter implements ISlackOAuthPort {
       teamId: data.team.id,
       botToken: data.access_token,
       botRefreshToken: data.refresh_token,
-      botExpiresAt: data.expires_in ? new Date(Date.now() + data.expires_in*1000) : undefined,
+      botExpiresAt: data.expires_in
+        ? new Date(Date.now() + data.expires_in * 1000)
+        : undefined,
       authedUser: data.authed_user && {
         id: data.authed_user.id,
         scope: data.authed_user.scope,
         accessToken: data.authed_user.access_token,
         refreshToken: data.authed_user.refresh_token,
-        expiresAt: data.authed_user.expires_in ? new Date(Date.now() + data.authed_user.expires_in*1000) : undefined
+        expiresAt: data.authed_user.expires_in
+          ? new Date(Date.now() + data.authed_user.expires_in * 1000)
+          : undefined,
       },
       appId: data.app_id,
-      installedAt: new Date()
+      installedAt: new Date(),
     };
     return { installation };
   }

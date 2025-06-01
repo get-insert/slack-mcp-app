@@ -94,11 +94,12 @@ export async function getUserChannelActivityHandler(args: unknown) {
       }
 
       // Get channel history
-      const historyResponse = await SlackContext.userClient.conversations.history({
-        channel: channel.id,
-        limit: maxMessagesPerChannel,
-        oldest: oldest.toString(),
-      });
+      const historyResponse =
+        await SlackContext.userClient.conversations.history({
+          channel: channel.id,
+          limit: maxMessagesPerChannel,
+          oldest: oldest.toString(),
+        });
 
       if (!historyResponse.ok) {
         console.error(
@@ -128,10 +129,11 @@ export async function getUserChannelActivityHandler(args: unknown) {
       // Get permalinks (only for important messages to avoid API rate limits)
       for (let i = 0; i < Math.min(3, processedMessages.length); i++) {
         try {
-          const permalinkResponse = await SlackContext.userClient.chat.getPermalink({
-            channel: channel.id,
-            message_ts: processedMessages[i].ts,
-          });
+          const permalinkResponse =
+            await SlackContext.userClient.chat.getPermalink({
+              channel: channel.id,
+              message_ts: processedMessages[i].ts,
+            });
 
           if (permalinkResponse.ok && permalinkResponse.permalink) {
             processedMessages[i].permalink = permalinkResponse.permalink;

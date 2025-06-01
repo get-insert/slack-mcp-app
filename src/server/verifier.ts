@@ -32,7 +32,7 @@ export class SlackRequestVerifier {
         if (!timestamp || !slackSignature) {
           const response: ErrorResponse = {
             ok: false,
-            error: 'missing_signature_headers'
+            error: 'missing_signature_headers',
           };
           return res.status(400).json(response);
         }
@@ -41,25 +41,29 @@ export class SlackRequestVerifier {
         if (age > this.tolerance * 1000) {
           const response: ErrorResponse = {
             ok: false,
-            error: 'timestamp_out_of_tolerance'
+            error: 'timestamp_out_of_tolerance',
           };
           return res.status(400).json(response);
         }
 
         const rawBody = (req as RequestWithRawBody).rawBody || '';
         const sigBasestring = `v0:${timestamp}:${rawBody}`;
-        const mySignature = 'v0=' +
-          crypto.createHmac('sha256', this.signingSecret)
+        const mySignature =
+          'v0=' +
+          crypto
+            .createHmac('sha256', this.signingSecret)
             .update(sigBasestring, 'utf8')
             .digest('hex');
 
         const sigBuffer = Buffer.from(mySignature, 'utf8');
         const slackSigBuffer = Buffer.from(slackSignature, 'utf8');
-        if (sigBuffer.length !== slackSigBuffer.length ||
-          !crypto.timingSafeEqual(sigBuffer, slackSigBuffer)) {
+        if (
+          sigBuffer.length !== slackSigBuffer.length ||
+          !crypto.timingSafeEqual(sigBuffer, slackSigBuffer)
+        ) {
           const response: ErrorResponse = {
             ok: false,
-            error: 'invalid_signature'
+            error: 'invalid_signature',
           };
           return res.status(400).json(response);
         }
@@ -69,7 +73,7 @@ export class SlackRequestVerifier {
         console.error('Verification error:', err);
         const response: ErrorResponse = {
           ok: false,
-          error: 'verification_failed'
+          error: 'verification_failed',
         };
         res.status(400).json(response);
       }

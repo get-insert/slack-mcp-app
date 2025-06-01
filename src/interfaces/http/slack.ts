@@ -25,27 +25,31 @@ export function createSlackRouter(
         </body>
       </html>
     `);
-  })
+  });
 
-  router.post('/onboard', express.urlencoded({extended:true}), async (req, res) => {
-    const { teamId, plan, llmEndpoint } = req.body;
-    // ToDo save to db by plan and llm, payment method, etc.
-    console.log('Onboarding request:', { teamId, plan, llmEndpoint });
-    res.json({
-      ok: true,
-      message: 'success onboarding',
-    });
-  })
+  router.post(
+    '/onboard',
+    express.urlencoded({ extended: true }),
+    async (req, res) => {
+      const { teamId, plan, llmEndpoint } = req.body;
+      // ToDo save to db by plan and llm, payment method, etc.
+      console.log('Onboarding request:', { teamId, plan, llmEndpoint });
+      res.json({
+        ok: true,
+        message: 'success onboarding',
+      });
+    }
+  );
 
   router.post('/events', async (req, res) => {
     await verifierAdapter.verify(req);
     res.sendStatus(200);
-  })
+  });
 
   router.post('/commands', async (req, res) => {
     await verifierAdapter.verify(req);
     res.sendStatus(200);
-  })
+  });
 
   router.post('/oauth/callback', async (req, res) => {
     try {
@@ -54,7 +58,7 @@ export function createSlackRouter(
 
       // State is handled like csrf token.
       console.log('OAuth callback received:', { code, state });
-      
+
       if (!code || typeof code !== 'string') {
         res.status(400).send('Authorization code is required');
         return;

@@ -14,7 +14,10 @@ export class FileInstallationRepository implements IInstallationRepo {
 
   async findByTeam(teamId: string): Promise<Installation | null> {
     try {
-      const buf = await fs.readFile(path.join(this.dir, `${teamId}.json`), 'utf8');
+      const buf = await fs.readFile(
+        path.join(this.dir, `${teamId}.json`),
+        'utf8'
+      );
       return JSON.parse(buf) as Installation;
     } catch {
       return null;

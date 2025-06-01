@@ -117,10 +117,13 @@ export async function listChannelCanvasesHandler(args: unknown) {
       console.log(
         `Trying direct API call for files.list in channel ${parsedArgs.channel_id}`
       );
-      const directResponse = await SlackContext.userClient.apiCall('files.list', {
-        channel: parsedArgs.channel_id,
-        count: 100,
-      });
+      const directResponse = await SlackContext.userClient.apiCall(
+        'files.list',
+        {
+          channel: parsedArgs.channel_id,
+          count: 100,
+        }
+      );
 
       console.log('Method 3 response:', JSON.stringify(directResponse));
 

@@ -9,12 +9,16 @@ if (!process.env.SLACK_CLIENT_ID) {
 }
 
 if (!process.env.SLACK_CLIENT_SECRET) {
-  console.error('SLACK_CLIENT_SECRET is not set. Please set it in your environment or .env file.');
+  console.error(
+    'SLACK_CLIENT_SECRET is not set. Please set it in your environment or .env file.'
+  );
   process.exit(1);
 }
 
 if (!process.env.SLACK_SIGNING_SECRET) {
-  console.error('SLACK_SIGNING_SECRET is not set. Please set it in your environment or .env file.');
+  console.error(
+    'SLACK_SIGNING_SECRET is not set. Please set it in your environment or .env file.'
+  );
   process.exit(1);
 }
 
