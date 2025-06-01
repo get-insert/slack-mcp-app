@@ -7,6 +7,7 @@ export default [
   js.configs.recommended,
   {
     files: ["**/*.{js,mjs,cjs,ts}"],
+    ignores: ["examples/**", "node_modules/**", "dist/**"],
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
       ecmaVersion: 2022
@@ -15,6 +16,7 @@ export default [
   ...tseslint.configs.recommended,
   {
     files: ["**/*.ts"],
+    ignores: ["examples/**", "node_modules/**", "dist/**"],
     plugins: { "@typescript-eslint": tseslint.plugin },
     languageOptions: {
       parser: tseslint.parser,

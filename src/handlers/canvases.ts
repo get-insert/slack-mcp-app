@@ -1,4 +1,4 @@
-import { userClient } from '../config/slack-client.js';
+import { SlackContext } from '../config/slack-client.js';
 import {
   ListChannelCanvasesRequestSchema,
   GetCanvasContentRequestSchema,
@@ -12,12 +12,16 @@ export async function listChannelCanvasesHandler(args: unknown) {
   const parsedArgs = ListChannelCanvasesRequestSchema.parse(args);
 
   try {
+    if (!SlackContext.userClient) {
+      throw new Error('UserToken is required');
+    }
+
     // Method 1: Try conversations.canvases.list API (new API)
     try {
       console.log(
         `Trying conversations.canvases.list for channel ${parsedArgs.channel_id}`
       );
-      const canvasResponse = await userClient.apiCall(
+      const canvasResponse = await SlackContext.userClient.apiCall(
         'conversations.canvases.list',
         {
           channel_id: parsedArgs.channel_id,
@@ -43,7 +47,7 @@ export async function listChannelCanvasesHandler(args: unknown) {
     }
 
     // Method 2: Use regular files.list API
-    const filesResponse = await userClient.files.list({
+    const filesResponse = await SlackContext.userClient.files.list({
       channel: parsedArgs.channel_id,
       types: 'all', // Get all types and filter later
       count: parsedArgs.limit || 100,
@@ -113,10 +117,13 @@ export async function listChannelCanvasesHandler(args: unknown) {
       console.log(
         `Trying direct API call for files.list in channel ${parsedArgs.channel_id}`
       );
-      const directResponse = await userClient.apiCall('files.list', {
-        channel: parsedArgs.channel_id,
-        count: 100,
-      });
+      const directResponse = await SlackContext.userClient.apiCall(
+        'files.list',
+        {
+          channel: parsedArgs.channel_id,
+          count: 100,
+        }
+      );
 
       console.log('Method 3 response:', JSON.stringify(directResponse));
 
@@ -186,10 +193,14 @@ export async function getCanvasContentHandler(args: unknown) {
   const parsedArgs = GetCanvasContentRequestSchema.parse(args);
 
   try {
+    if (!SlackContext.userClient) {
+      throw new Error('UserToken is required');
+    }
+
     console.log(`Getting basic info for canvas ID: ${parsedArgs.canvas_id}`);
 
     // Get basic information for specific canvas
-    const response = await userClient.files.info({
+    const response = await SlackContext.userClient.files.info({
       file: parsedArgs.canvas_id,
     });
 
@@ -243,8 +254,12 @@ export async function summarizeUserCanvasesHandler(args: unknown) {
   const parsedArgs = SummarizeUserCanvasesRequestSchema.parse(args);
 
   try {
+    if (!SlackContext.userClient) {
+      throw new Error('UserToken is required');
+    }
+
     // 1. Get all channels the user is participating in
-    const channelsResponse = await userClient.users.conversations({
+    const channelsResponse = await SlackContext.userClient.users.conversations({
       types: parsedArgs.include_private
         ? 'public_channel,private_channel'
         : 'public_channel',
@@ -277,7 +292,7 @@ export async function summarizeUserCanvasesHandler(args: unknown) {
     for (const channel of channelsResponse.channels) {
       try {
         // Get file list in channel
-        const filesResponse = await userClient.files.list({
+        const filesResponse = await SlackContext.userClient.files.list({
           channel: channel.id,
           types: 'all', // Get all types
           count: parsedArgs.max_canvases_per_channel || 20,

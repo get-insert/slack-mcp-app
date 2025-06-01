@@ -138,3 +138,6 @@ dist
 
 # SAM
 .aws-sam/
+
+# db
+db/**/*.json
