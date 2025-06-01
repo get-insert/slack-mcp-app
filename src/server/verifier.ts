@@ -11,8 +11,8 @@ interface ErrorResponse {
   error: string;
 }
 
-interface SuccessResponse {
-  ok: true;
+interface RequestWithRawBody extends Request {
+  rawBody?: string;
 }
 
 export class SlackRequestVerifier {
@@ -46,7 +46,7 @@ export class SlackRequestVerifier {
           return res.status(400).json(response);
         }
 
-        const rawBody = (req as any).rawBody || '';
+        const rawBody = (req as RequestWithRawBody).rawBody || '';
         const sigBasestring = `v0:${timestamp}:${rawBody}`;
         const mySignature = 'v0=' +
           crypto.createHmac('sha256', this.signingSecret)

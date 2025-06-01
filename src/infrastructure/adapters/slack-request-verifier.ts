@@ -2,6 +2,10 @@ import crypto from 'crypto';
 import { IRequestVerifierPort } from '../../domain/ports/request-verifier.js';
 import { Request } from 'express';
 
+interface RequestWithRawBody extends Request {
+  rawBody: string;
+}
+
 export class SlackRequestVerifierAdapter implements IRequestVerifierPort {
   constructor(
     private signingSecret: string,
@@ -16,7 +20,7 @@ export class SlackRequestVerifierAdapter implements IRequestVerifierPort {
     const age = Math.abs(Date.now() - Number(ts) * 1000);
     if (age > this.timestampToleranceSec * 1000) throw new Error('Timestamp out of range');
 
-    const raw = (req as any).rawBody as string;
+    const raw = (req as RequestWithRawBody).rawBody as string;
     const base = `v0:${ts}:${raw}`;
     const mySig = 'v0=' + crypto.createHmac('sha256', this.signingSecret).update(base).digest('hex');
     if (!crypto.timingSafeEqual(Buffer.from(mySig), Buffer.from(sig))) throw new Error('Invalid signature');

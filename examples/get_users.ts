@@ -51,7 +51,6 @@ async function main() {
       resolve(__dirname, '../ts-node-loader.js'),
       resolve(__dirname, '../src/index.ts'),
     ],
-    env,
   });
 
   try {
