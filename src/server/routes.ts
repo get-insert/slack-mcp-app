@@ -41,22 +41,24 @@ export function setupRoutes(
   // POST request handler (client to server communication)
   app.post(
     '/mcp',
-    // extractSlackTokens,
     async (req, res) => {
-      // Check for existing session ID
-      const sessionId = req.headers['mcp-session-id'] as string | undefined;
-
       const teamId = req.body.team_id;
+      
       const installationRepo = new FileInstallationRepository('./db/installations');
-      const installation = await installationRepo.findByTeam(teamId);
+      const installation = await installationRepo.findByTeam(teamId);      
       if (!installation) {
+        console.log('No installation found for team:', teamId);
         res.status(401).json({ error: 'Missing slack_bot_token' });
         return;
       }
 
       SlackContext.botClient = new WebClient(installation.botToken);
-      SlackContext.userClient = new WebClient(installation.authedUser?.accessToken);
+      if (installation.authedUser?.accessToken) {
+        SlackContext.userClient = new WebClient(installation.authedUser.accessToken);
+      }
 
+      // Check for existing session ID
+      const sessionId = req.headers['mcp-session-id'] as string | undefined;
       if (sessionId && transportManager.getTransport(sessionId)) {
         // Reuse existing transport
         const transport = transportManager.getTransport(sessionId)!;

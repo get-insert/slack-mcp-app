@@ -41,6 +41,10 @@ function hasMention(message: string): boolean {
 export async function getUserChannelActivityHandler(args: unknown) {
   const parsedArgs = GetUserChannelActivityRequestSchema.parse(args);
 
+  if (!SlackContext.userClient) {
+    throw new Error('UserToken is required');
+  }
+
   // Configuration parameters
   const days = parsedArgs.days || 1;
   const maxChannels = parsedArgs.max_channels || 5;

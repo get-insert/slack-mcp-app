@@ -12,6 +12,9 @@ import {
 export async function listFilesInChannelHandler(args: unknown) {
   const parsedArgs = ListFilesInChannelRequestSchema.parse(args);
 
+  if (!SlackContext.userClient) {
+    throw new Error('UserToken is required');
+  }
   // Get file list from channel
   const response = await SlackContext.userClient.files.list({
     channel: parsedArgs.channel_id,
@@ -36,6 +39,9 @@ export async function listFilesInChannelHandler(args: unknown) {
 export async function getFileInfoHandler(args: unknown) {
   const parsedArgs = GetFileInfoRequestSchema.parse(args);
 
+  if (!SlackContext.userClient) {
+    throw new Error('UserToken is required');
+  }
   // Get specific file information
   const response = await SlackContext.userClient.files.info({
     file: parsedArgs.file_id,
@@ -56,6 +62,9 @@ export async function getFileInfoHandler(args: unknown) {
 export async function summarizeChannelFilesHandler(args: unknown) {
   const parsedArgs = SummarizeChannelFilesRequestSchema.parse(args);
 
+  if (!SlackContext.userClient) {
+    throw new Error('UserToken is required');
+  }
   // 1. Get all channels the user is a member of
   const channelsResponse = await SlackContext.userClient.users.conversations({
     types: parsedArgs.include_private

@@ -12,6 +12,10 @@ export async function listChannelCanvasesHandler(args: unknown) {
   const parsedArgs = ListChannelCanvasesRequestSchema.parse(args);
 
   try {
+    if (!SlackContext.userClient) {
+      throw new Error('UserToken is required');
+    }
+
     // Method 1: Try conversations.canvases.list API (new API)
     try {
       console.log(
@@ -186,6 +190,10 @@ export async function getCanvasContentHandler(args: unknown) {
   const parsedArgs = GetCanvasContentRequestSchema.parse(args);
 
   try {
+    if (!SlackContext.userClient) {
+      throw new Error('UserToken is required');
+    }
+
     console.log(`Getting basic info for canvas ID: ${parsedArgs.canvas_id}`);
 
     // Get basic information for specific canvas
@@ -243,6 +251,10 @@ export async function summarizeUserCanvasesHandler(args: unknown) {
   const parsedArgs = SummarizeUserCanvasesRequestSchema.parse(args);
 
   try {
+    if (!SlackContext.userClient) {
+      throw new Error('UserToken is required');
+    }
+
     // 1. Get all channels the user is participating in
     const channelsResponse = await SlackContext.userClient.users.conversations({
       types: parsedArgs.include_private
