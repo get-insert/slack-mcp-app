@@ -35,15 +35,10 @@ Resources:
           SLACK_CLIENT_ID: !Ref SlackClientId
           SLACK_CLIENT_SECRET: !Ref SlackClientSecret
           SLACK_SIGNING_SECRET: !Ref SlackSigningSecret
-          DOMAIN: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
+          DOMAIN: !Sub "https://${AWS::StackName}-api.execute-api.${AWS::Region}.amazonaws.com/Prod"
           MODE: http
       Events:
-        ApiRoot:
-          Type: Api
-          Properties:
-            Path: /
-            Method: ANY
-        ApiProxy:
+        Api:
           Type: Api
           Properties:
             Path: /{proxy+}
