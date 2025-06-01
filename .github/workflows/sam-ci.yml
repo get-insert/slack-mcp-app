@@ -23,7 +23,7 @@ jobs:
       run: npm ci
     
     - name: Build TypeScript
-      run: npm run build
+      run: npm run build && npm run build:lambda
     
     - name: Setup AWS SAM CLI
       uses: aws-actions/setup-sam@v2

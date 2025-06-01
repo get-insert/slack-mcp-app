@@ -1,0 +1,6 @@
+{
+  "name": "@get-insert/slack-mcp-server-lambda",
+  "version": "0.0.4",
+  "description": "Lambda build of Slack MCP Server",
+  "main": "lambda-entry.js"
+}
