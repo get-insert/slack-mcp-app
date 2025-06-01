@@ -1,4 +1,4 @@
-import { userClient } from '../config/slack-client.js';
+import { SlackContext } from '../config/slack-client.js';
 import {
   GetUserChannelActivityRequestSchema,
   GetUserChannelActivityResponseSchema,
@@ -41,6 +41,10 @@ function hasMention(message: string): boolean {
 export async function getUserChannelActivityHandler(args: unknown) {
   const parsedArgs = GetUserChannelActivityRequestSchema.parse(args);
 
+  if (!SlackContext.userClient) {
+    throw new Error('UserToken is required');
+  }
+
   // Configuration parameters
   const days = parsedArgs.days || 1;
   const maxChannels = parsedArgs.max_channels || 5;
@@ -51,7 +55,7 @@ export async function getUserChannelActivityHandler(args: unknown) {
   const oldest = getTimestampNDaysAgo(days);
 
   // Get list of channels user is participating in
-  const channelsResponse = await userClient.users.conversations({
+  const channelsResponse = await SlackContext.userClient.users.conversations({
     types: includePrivate ? 'public_channel,private_channel' : 'public_channel',
     exclude_archived: true,
     limit: 200, // Get maximum number
@@ -90,11 +94,12 @@ export async function getUserChannelActivityHandler(args: unknown) {
       }
 
       // Get channel history
-      const historyResponse = await userClient.conversations.history({
-        channel: channel.id,
-        limit: maxMessagesPerChannel,
-        oldest: oldest.toString(),
-      });
+      const historyResponse =
+        await SlackContext.userClient.conversations.history({
+          channel: channel.id,
+          limit: maxMessagesPerChannel,
+          oldest: oldest.toString(),
+        });
 
       if (!historyResponse.ok) {
         console.error(
@@ -124,10 +129,11 @@ export async function getUserChannelActivityHandler(args: unknown) {
       // Get permalinks (only for important messages to avoid API rate limits)
       for (let i = 0; i < Math.min(3, processedMessages.length); i++) {
         try {
-          const permalinkResponse = await userClient.chat.getPermalink({
-            channel: channel.id,
-            message_ts: processedMessages[i].ts,
-          });
+          const permalinkResponse =
+            await SlackContext.userClient.chat.getPermalink({
+              channel: channel.id,
+              message_ts: processedMessages[i].ts,
+            });
 
           if (permalinkResponse.ok && permalinkResponse.permalink) {
             processedMessages[i].permalink = permalinkResponse.permalink;
