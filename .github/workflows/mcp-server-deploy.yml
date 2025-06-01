@@ -1,3 +1,5 @@
+name: MCP Server Deploy
+
 on:
     push:
       branches:
