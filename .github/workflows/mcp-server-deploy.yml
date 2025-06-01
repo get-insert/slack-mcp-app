@@ -37,6 +37,7 @@ jobs:
               --capabilities CAPABILITY_IAM \
               --no-confirm-changeset \
               --no-fail-on-empty-changeset \
+              --force-upload \
               --parameter-overrides \
                 ParameterKey=SlackClientId,ParameterValue=xoxb-test-client-id \
                 ParameterKey=SlackClientSecret,ParameterValue=test-client-secret-value \
