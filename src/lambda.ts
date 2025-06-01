@@ -36,7 +36,7 @@ import {
   GetUserChannelActivityRequestSchema,
 } from './schemas.js';
 
-let serverlessExpressInstance: ReturnType<typeof configure>;
+let serverlessExpressInstance: ReturnType<typeof configure> | undefined;
 
 function createMCPServer(): Server {
   const server = new Server(
@@ -205,5 +205,17 @@ export const handler = async (
     serverlessExpressInstance = configure({ app });
   }
 
-  return serverlessExpressInstance(event, context);
+  return new Promise((resolve, reject) => {
+    if (!serverlessExpressInstance) {
+      reject(new Error('Serverless express instance not initialized'));
+      return;
+    }
+    serverlessExpressInstance(event, context, (error: any, result: any) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(result);
+      }
+    });
+  });
 };
