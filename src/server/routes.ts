@@ -40,7 +40,9 @@ export function setupRoutes(
 
   // POST request handler (client to server communication)
   app.post('/mcp', async (req, res) => {
-    const teamId = req.body.team_id;
+    // Get team_id from header (support for mcp-remote custom headers)
+    // MCP-Remote-Client initialize request only allows custom headers
+    const teamId = req.headers['x-team-id'] as string;
 
     const installationRepo = new FileInstallationRepository(
       './db/installations'
