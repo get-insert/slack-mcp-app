@@ -31,7 +31,7 @@ Available tools:
 ### Installation
 
 ```bash
-npm install @watanabe-baketsu/slack-mcp-server
+npm install @get-insert/slack-mcp-server
 ```
 
 NOTE: Its now hosted in GitHub Registry so you need your PAT.
@@ -65,7 +65,7 @@ EXMAPLES_SLACK_USER_TOKEN=xoxp-your-user-token
 
 Directly:
 ```bash
-npx @watanabe-baketsu/slack-mcp-server
+npx @get-insert/slack-mcp-server
 ```
 
 Or, run the installed module with node:
@@ -81,7 +81,7 @@ node node_modules/.bin/slack-mcp-server
     "command": "npx",
     "args": [
       "-y",
-      "@watanabe-baketsu/slack-mcp-server"
+      "@get-insert/slack-mcp-server"
     ],
     "env": {
       "NPM_CONFIG_//npm.pkg.github.com/:_authToken": "<your-github-pat>",
@@ -110,6 +110,51 @@ This server adopts the following implementation pattern:
 For example, the `slack_list_channels` implementation parses the request with `ListChannelsRequestSchema`, calls `slackClient.conversations.list`, and returns the response parsed with `ListChannelsResponseSchema`.
 
 ## Development
+
+### Prerequisites
+
+#### AWS SAM CLI Installation
+
+AWS SAM CLI installation is required for setting up the development environment. Please follow the documentation below for installation:
+
+[AWS SAM CLI Installation Guide](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/install-sam-cli.html)
+
+#### Build & local debug
+
+To build and debug the server locally using AWS SAM CLI:
+
+1. Build the project:
+```bash
+sam build
+```
+
+2. Start the local API:
+```bash
+sam local start-api
+```
+
+The server will be available at `http://localhost:3000`.
+
+#### Deploy to AWS
+
+You can also deploy to AWS environment for quick testing using SAM CLI:
+
+1. Deploy with guided setup (first time):
+```bash
+sam deploy --guided
+```
+
+2. Deploy with existing configuration:
+```bash
+sam deploy
+```
+
+3. Delete the deployed stack when no longer needed:
+```bash
+sam delete
+```
+
+Note: Make sure to configure your AWS credentials and region before deployment. The deployed API Gateway endpoint will be displayed after successful deployment.
 
 ### Available Scripts
 

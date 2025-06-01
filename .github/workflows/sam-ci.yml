@@ -1,0 +1,42 @@
+name: SAM CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sam-build-and-validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build TypeScript
+      run: npm run build
+    
+    - name: Setup AWS SAM CLI
+      uses: aws-actions/setup-sam@v2
+      with:
+        use-installer: true
+    
+    - name: SAM Build
+      run: sam build --debug
+    
+    - name: SAM Validate
+      run: sam validate
+    
+    - name: Check SAM build artifacts
+      run: |
+        ls -la .aws-sam/build/
+        ls -la .aws-sam/build/SlackMCPServerFunction/

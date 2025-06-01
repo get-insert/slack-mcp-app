@@ -136,8 +136,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# Environment variables
-.env
-node_modules/
-dist/
+# SAM
+.aws-sam/
+
+# db
 db/**/*.json

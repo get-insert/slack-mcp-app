@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Slack MCP Server - AWS Lambda deployment
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Parameters:
+  SlackClientId:
+    Type: String
+    Description: Slack OAuth Client ID
+    NoEcho: true
+  SlackClientSecret:
+    Type: String
+    Description: Slack OAuth Client Secret
+    NoEcho: true
+  SlackSigningSecret:
+    Type: String
+    Description: Slack Signing Secret for request verification
+    NoEcho: true
+
+Resources:
+  SlackMCPServerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/lambda.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - x86_64
+      MemorySize: 512
+      Timeout: 30
+      Description: Slack MCP Server for AI assistant integration
+      Environment:
+        Variables:
+          SLACK_CLIENT_ID: !Ref SlackClientId
+          SLACK_CLIENT_SECRET: !Ref SlackClientSecret
+          SLACK_SIGNING_SECRET: !Ref SlackSigningSecret
+          DOMAIN: !Sub "https://${AWS::StackName}-api.execute-api.${AWS::Region}.amazonaws.com/Prod"
+          MODE: http
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  SlackMCPServerEndpoint:
+    Description: "API Gateway endpoint URL for Slack MCP Server"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Export:
+      Name: !Sub "${AWS::StackName}-SlackMCPServerEndpoint"

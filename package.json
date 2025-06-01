@@ -1,5 +1,5 @@
 {
-  "name": "@watanabe-baketsu/slack-mcp-server",
+  "name": "@get-insert/slack-mcp-server",
   "version": "0.0.4",
   "description": "A Slack MCP server",
   "main": "dist/index.js",
@@ -28,16 +28,18 @@
   "author": "Ubie, Inc.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/watanabe-baketsu/slack-mcp-server.git"
+    "url": "https://github.com/get-insert/slack-mcp-app.git"
   },
-  "homepage": "https://github.com/watanabe-baketsu/slack-mcp-server",
+  "homepage": "https://github.com/get-insert/slack-mcp-app",
   "bugs": {
-    "url": "https://github.com/watanabe-baketsu/slack-mcp-server/issues"
+    "url": "https://github.com/get-insert/slack-mcp-app/issues"
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "@codegenie/serverless-express": "^4.16.0",
     "@modelcontextprotocol/sdk": "^1.0.4",
     "@slack/web-api": "^7.9.1",
+    "@types/aws-lambda": "^8.10.149",
     "@types/express": "^5.0.1",
     "@types/node": "^20.10.3",
     "axios": "^1.9.0",

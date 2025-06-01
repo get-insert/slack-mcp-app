@@ -1,0 +1,18 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - npm install
+  pre_build:
+    commands:
+      - npm run test
+      - npm run build
+      - npm prune --production
+  build:
+    commands:
+      - sam build
+      - sam package --s3-bucket $S3_BUCKET --output-template-file template-export.yml
+artifacts:
+  type: zip
+  files:
+    - template-export.yml
