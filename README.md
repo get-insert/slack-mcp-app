@@ -125,7 +125,10 @@ To build and debug the server locally using AWS SAM CLI:
 
 1. Build the project:
 ```bash
+npm run build:lambda
 sam build
+
+cp -r dist-lambda .aws-sam/build/SlackMCPServerFunction/
 ```
 
 2. Start the local API:

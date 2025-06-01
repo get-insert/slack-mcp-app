@@ -185,13 +185,21 @@ function createMCPServer(): Server {
 }
 
 function createExpressApp(): express.Application {
+  console.log('Creating Express app');
   const app = express();
   app.use(express.json());
 
+  console.log('Creating MCP server');
   const server = createMCPServer();
+  console.log('MCP server created successfully');
+  
+  console.log('Creating transport manager');
   const transportManager = new TransportManager(server);
+  console.log('Transport manager created successfully');
 
+  console.log('Setting up routes');
   setupRoutes(app, transportManager);
+  console.log('Routes setup completed');
 
   return app;
 }
@@ -200,26 +208,47 @@ export const handler = async (
   event: APIGatewayProxyEvent,
   context: Context
 ): Promise<APIGatewayProxyResult> => {
-  if (!serverlessExpressInstance) {
-    const app = createExpressApp();
-    serverlessExpressInstance = configure({ app });
-  }
-
-  return new Promise((resolve, reject) => {
+  console.log('Lambda handler started');
+  console.log('Event:', JSON.stringify(event, null, 2));
+  
+  try {
     if (!serverlessExpressInstance) {
-      reject(new Error('Serverless express instance not initialized'));
-      return;
+      console.log('Creating new Express app instance');
+      const app = createExpressApp();
+      serverlessExpressInstance = configure({ app });
+      console.log('Express app instance created successfully');
     }
-    serverlessExpressInstance(
-      event,
-      context,
-      (error: unknown, result: unknown) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result as APIGatewayProxyResult);
-        }
+
+    console.log('Processing request with serverless express');
+    return new Promise((resolve, reject) => {
+      if (!serverlessExpressInstance) {
+        const error = new Error('Serverless express instance not initialized');
+        console.error('Serverless express instance error:', error);
+        reject(error);
+        return;
       }
-    );
-  });
+      serverlessExpressInstance(
+        event,
+        context,
+        (error: unknown, result: unknown) => {
+          if (error) {
+            console.error('Serverless express execution error:', error);
+            reject(error);
+          } else {
+            console.log('Request processed successfully, result:', JSON.stringify(result, null, 2));
+            resolve(result as APIGatewayProxyResult);
+          }
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Lambda handler error:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: 'Internal server error',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }),
+    };
+  }
 };
