@@ -13,7 +13,7 @@ export class DynamoDBInstallationRepository implements IInstallationRepo {
 
   constructor(tableName?: string, region?: string) {
     const dynamoClient = new DynamoDBClient({
-      region: region || process.env.AWS_REGION || 'ap-northeast-1',
+      region: region || 'ap-northeast-1',
     });
     this.client = DynamoDBDocumentClient.from(dynamoClient);
     this.tableName =
