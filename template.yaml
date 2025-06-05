@@ -28,9 +28,20 @@ Resources:
       AttributeDefinitions:
         - AttributeName: teamId
           AttributeType: S
+        - AttributeName: installedAt
+          AttributeType: S
       KeySchema:
         - AttributeName: teamId
           KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: teamId-installedAt-index
+          KeySchema:
+            - AttributeName: teamId
+              KeyType: HASH
+            - AttributeName: installedAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
 
   SlackMCPServerFunction:
     Type: AWS::Serverless::Function

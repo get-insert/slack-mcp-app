@@ -2,7 +2,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,
   PutCommand,
-  GetCommand,
+  QueryCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { IInstallationRepo } from '../../../domain/repositories/installation.js';
 import { Installation } from '../../../domain/entities/installation.js';
@@ -52,19 +52,23 @@ export class DynamoDBInstallationRepository implements IInstallationRepo {
   async findByTeam(teamId: string): Promise<Installation | null> {
     try {
       const response = await this.client.send(
-        new GetCommand({
+        new QueryCommand({
           TableName: this.tableName,
-          Key: {
-            teamId: teamId,
+          IndexName: 'teamId-installedAt-index',
+          KeyConditionExpression: 'teamId = :teamId',
+          ExpressionAttributeValues: {
+            ':teamId': teamId,
           },
+          ScanIndexForward: false,
+          Limit: 1,
         })
       );
 
-      if (!response.Item) {
+      if (!response.Items || response.Items.length === 0) {
         return null;
       }
 
-      const item = response.Item;
+      const item = response.Items[0];
       return {
         teamId: item.teamId,
         botToken: item.botToken,
