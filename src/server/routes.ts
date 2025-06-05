@@ -6,7 +6,7 @@ import { TransportManager } from './transport.js';
 import { SlackContext } from '../config/slack-client.js';
 import { createSlackRouter } from '../interfaces/http/slack.js';
 import { SlackOAuthAdapter } from '../infrastructure/adapters/slack-oauth.js';
-import { DynamoDBInstallationRepository } from '../infrastructure/repositories/dynamodb-installation.js';
+import { DynamoDBInstallationRepository } from '../infrastructure/repositories/dynamo/installation.js';
 import { HandleOAuthUseCase } from '../usecases/handle-oauth-usercase.js';
 import { SlackRequestVerifierAdapter } from '../infrastructure/adapters/slack-request-verifier.js';
 
