@@ -40,7 +40,7 @@ export function setupRoutes(
 
   // POST request handler (client to server communication)
   app.post('/mcp', async (req, res) => {
-    const teamId = req.body.team_id;
+    const teamId = req.headers['x-team-id'] as string;
 
     const installationRepo = new DynamoDBInstallationRepository();
     const installation = await installationRepo.findByTeam(teamId);
