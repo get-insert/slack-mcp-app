@@ -40,6 +40,6 @@ jobs:
               --no-fail-on-empty-changeset \
               --force-upload \
               --parameter-overrides \
-                ParameterKey=SlackClientId,ParameterValue=xoxb-test-client-id \
-                ParameterKey=SlackClientSecret,ParameterValue=test-client-secret-value \
-                ParameterKey=SlackSigningSecret,ParameterValue=test-signing-secret-value
+                ParameterKey=SlackClientId,ParameterValue=${{ secrets.SLACK_CLIENT_ID }} \
+                ParameterKey=SlackClientSecret,ParameterValue=${{ secrets.SLACK_CLIENT_SECRET }} \
+                ParameterKey=SlackSigningSecret,ParameterValue=${{ secrets.SLACK_SIGNING_SECRET }}

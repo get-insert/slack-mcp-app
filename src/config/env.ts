@@ -38,3 +38,4 @@ export const SLACK_SIGNING_SECRET = process.env.SLACK_SIGNING_SECRET;
 export const DOMAIN = process.env.DOMAIN || 'http://localhost:3000';
 export const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 export const MODE = process.env.MODE;
+export const DYNAMODB_TABLE_NAME = process.env.DYNAMODB_TABLE_NAME;

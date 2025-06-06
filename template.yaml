@@ -20,6 +20,29 @@ Parameters:
     NoEcho: true
 
 Resources:
+  SlackInstallationsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${AWS::StackName}-slack-installations"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: teamId
+          AttributeType: S
+        - AttributeName: installedAt
+          AttributeType: S
+      KeySchema:
+        - AttributeName: teamId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: teamId-installedAt-index
+          KeySchema:
+            - AttributeName: teamId
+              KeyType: HASH
+            - AttributeName: installedAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
   SlackMCPServerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -37,6 +60,10 @@ Resources:
           SLACK_SIGNING_SECRET: !Ref SlackSigningSecret
           DOMAIN: !Sub "https://${AWS::StackName}-api.execute-api.${AWS::Region}.amazonaws.com/Prod"
           MODE: http
+          DYNAMODB_TABLE_NAME: !Ref SlackInstallationsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SlackInstallationsTable
       Events:
         Api:
           Type: Api

@@ -14,11 +14,7 @@ import {
 export async function listChannelsHandler(args: unknown) {
   const parsedArgs = ListChannelsRequestSchema.parse(args);
 
-  if (!SlackContext.userClient) {
-    throw new Error('UserToken is required');
-  }
-
-  const response = await SlackContext.userClient.conversations.list({
+  const response = await SlackContext.botClient.conversations.list({
     limit: parsedArgs.limit,
     cursor: parsedArgs.cursor,
     types: 'public_channel,private_channel', // Include private channels
@@ -40,11 +36,7 @@ export async function listChannelsHandler(args: unknown) {
 export async function getUserChannelsHandler(args: unknown) {
   const parsedArgs = GetUserChannelsRequestSchema.parse(args);
 
-  // Use userClient to get all channels the user has joined
-  if (!SlackContext.userClient) {
-    throw new Error('UserToken is required');
-  }
-  const response = await SlackContext.userClient.users.conversations({
+  const response = await SlackContext.botClient.users.conversations({
     types: 'public_channel,private_channel',
     exclude_archived: true,
     limit: parsedArgs.limit,

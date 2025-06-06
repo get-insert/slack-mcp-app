@@ -6,7 +6,7 @@ import { TransportManager } from './transport.js';
 import { SlackContext } from '../config/slack-client.js';
 import { createSlackRouter } from '../interfaces/http/slack.js';
 import { SlackOAuthAdapter } from '../infrastructure/adapters/slack-oauth.js';
-import { FileInstallationRepository } from '../infrastructure/repositories/installation.js';
+import { DynamoDBInstallationRepository } from '../infrastructure/repositories/dynamo/installation.js';
 import { HandleOAuthUseCase } from '../usecases/handle-oauth-usercase.js';
 import { SlackRequestVerifierAdapter } from '../infrastructure/adapters/slack-request-verifier.js';
 
@@ -40,13 +40,9 @@ export function setupRoutes(
 
   // POST request handler (client to server communication)
   app.post('/mcp', async (req, res) => {
-    // Get team_id from header (support for mcp-remote custom headers)
-    // MCP-Remote-Client initialize request only allows custom headers
     const teamId = req.headers['x-team-id'] as string;
 
-    const installationRepo = new FileInstallationRepository(
-      './db/installations'
-    );
+    const installationRepo = new DynamoDBInstallationRepository();
     const installation = await installationRepo.findByTeam(teamId);
     if (!installation) {
       console.log('No installation found for team:', teamId);
@@ -89,7 +85,7 @@ export function setupRoutes(
     process.env.SLACK_CLIENT_SECRET!,
     process.env.SLACK_REDIRECT_URI!
   );
-  const installationRepo = new FileInstallationRepository('./db/installations');
+  const installationRepo = new DynamoDBInstallationRepository();
   const oauthUseCase = new HandleOAuthUseCase(oauthPort, installationRepo);
   const verifierAdapter = new SlackRequestVerifierAdapter(
     process.env.SLACK_SIGNING_SECRET!
