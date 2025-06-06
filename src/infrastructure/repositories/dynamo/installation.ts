@@ -16,7 +16,7 @@ export class DynamoDBInstallationRepository implements IInstallationRepo {
       region: region || 'ap-northeast-1',
     };
 
-    // ローカルDynamoDBエンドポイントが設定されている場合
+    // If local DynamoDB endpoint is configured
     if (process.env.DYNAMODB_ENDPOINT) {
       clientConfig.endpoint = process.env.DYNAMODB_ENDPOINT;
       clientConfig.credentials = {
