@@ -46,12 +46,12 @@ Resources:
   SlackMCPServerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: dist-lambda/lambda-entry.handler
+      Handler: dist/lambda-entry.handler
       Runtime: nodejs20.x
       Architectures:
-        - x86_64
+        - arm64
       MemorySize: 512
-      Timeout: 30
+      Timeout: 20
       Description: Slack MCP Server for AI assistant integration
       Environment:
         Variables:
