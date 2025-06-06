@@ -15,7 +15,11 @@ export class DynamoDBInstallationRepository implements IInstallationRepo {
     const dynamoClient = new DynamoDBClient({
       region: region || 'ap-northeast-1',
     });
-    this.client = DynamoDBDocumentClient.from(dynamoClient);
+    this.client = DynamoDBDocumentClient.from(dynamoClient, {
+      marshallOptions: {
+        removeUndefinedValues: true,
+      },
+    });
     this.tableName =
       tableName || process.env.DYNAMODB_TABLE_NAME || 'slack-installations';
   }
