@@ -10,7 +10,6 @@
   "scripts": {
     "dev": "node --import ./ts-node-loader.js src/index.ts",
     "build": "tsc -p tsconfig.build.json && shx chmod +x dist/*.js",
-    "build:lambda": "tsc -p tsconfig.lambda.json",
     "start": "node dist/index.js",
     "test": "echo \"No tests yet\"",
     "lint": "npm run lint:eslint && npm run lint:prettier",
