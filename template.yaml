@@ -61,6 +61,7 @@ Resources:
           DOMAIN: !Sub "https://${AWS::StackName}-api.execute-api.${AWS::Region}.amazonaws.com/Prod"
           MODE: http
           DYNAMODB_TABLE_NAME: !Ref SlackInstallationsTable
+          DYNAMODB_ENDPOINT: ""
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref SlackInstallationsTable

@@ -125,14 +125,19 @@ To build and debug the server locally using AWS SAM CLI:
 
 1. Build the project:
 ```bash
+npm run build
 sam build
-
-cp -r db/installations .aws-sam/build/SlackMCPServerFunction/db/
 ```
 
-2. Start the local API:
+2. ローカルDynamoDBの起動とテストデータの準備:
 ```bash
-sam local start-api
+# DynamoDB Localを起動し、テストデータを投入
+npm run local:setup
+```
+
+3. Start the local API:
+```bash
+sam local start-api --env-vars env-local.json
 ```
 
 The server will be available at `http://localhost:3000`.
@@ -166,6 +171,10 @@ Note: Make sure to configure your AWS credentials and region before deployment. 
 - `npm run lint` - Run linting checks (ESLint and Prettier)
 - `npm run fix` - Automatically fix linting issues
 - `npm run examples` - Run example scripts
+- `npm run local:setup` - ローカルDynamoDBを起動してテストデータを投入
+- `npm run local:db:start` - ローカルDynamoDBを起動
+- `npm run local:db:stop` - ローカルDynamoDBを停止
+- `npm run local:db:setup` - テストデータを投入
 
 ### Docker Deployment
 

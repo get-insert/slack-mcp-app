@@ -29,6 +29,8 @@ watch = true
 
 [default.local_start_api.parameters]
 warm_containers = "EAGER"
+parameter_overrides = "SlackClientId=test-client-id SlackClientSecret=test-client-secret SlackSigningSecret=test-signing-secret"
+env_vars = "env-local.json"
 
 [default.local_start_lambda.parameters]
 warm_containers = "EAGER"
