@@ -12,11 +12,8 @@ import {
 export async function listFilesInChannelHandler(args: unknown) {
   const parsedArgs = ListFilesInChannelRequestSchema.parse(args);
 
-  if (!SlackContext.userClient) {
-    throw new Error('UserToken is required');
-  }
   // Get file list from channel
-  const response = await SlackContext.userClient.files.list({
+  const response = await SlackContext.botClient.files.list({
     channel: parsedArgs.channel_id,
     count: parsedArgs.limit,
     page: parsedArgs.cursor ? parseInt(parsedArgs.cursor) : 1,
@@ -39,11 +36,8 @@ export async function listFilesInChannelHandler(args: unknown) {
 export async function getFileInfoHandler(args: unknown) {
   const parsedArgs = GetFileInfoRequestSchema.parse(args);
 
-  if (!SlackContext.userClient) {
-    throw new Error('UserToken is required');
-  }
   // Get specific file information
-  const response = await SlackContext.userClient.files.info({
+  const response = await SlackContext.botClient.files.info({
     file: parsedArgs.file_id,
   });
 
@@ -62,11 +56,8 @@ export async function getFileInfoHandler(args: unknown) {
 export async function summarizeChannelFilesHandler(args: unknown) {
   const parsedArgs = SummarizeChannelFilesRequestSchema.parse(args);
 
-  if (!SlackContext.userClient) {
-    throw new Error('UserToken is required');
-  }
   // 1. Get all channels the user is a member of
-  const channelsResponse = await SlackContext.userClient.users.conversations({
+  const channelsResponse = await SlackContext.botClient.users.conversations({
     types: parsedArgs.include_private
       ? 'public_channel,private_channel'
       : 'public_channel',
@@ -99,7 +90,7 @@ export async function summarizeChannelFilesHandler(args: unknown) {
   for (const channel of channelsResponse.channels) {
     try {
       // Get file list from channel
-      const filesResponse = await SlackContext.userClient.files.list({
+      const filesResponse = await SlackContext.botClient.files.list({
         channel: channel.id,
         count: parsedArgs.max_files_per_channel,
         types: parsedArgs.file_types || undefined,

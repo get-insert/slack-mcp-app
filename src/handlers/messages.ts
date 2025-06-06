@@ -17,10 +17,7 @@ import {
  */
 export async function postMessageHandler(args: unknown) {
   const parsedArgs = PostMessageRequestSchema.parse(args);
-  if (!SlackContext.userClient) {
-    throw new Error('UserToken is required');
-  }
-  const response = await SlackContext.userClient.chat.postMessage({
+  const response = await SlackContext.botClient.chat.postMessage({
     channel: parsedArgs.channel_id,
     text: parsedArgs.text,
   });
@@ -39,10 +36,7 @@ export async function postMessageHandler(args: unknown) {
  */
 export async function replyToThreadHandler(args: unknown) {
   const parsedArgs = ReplyToThreadRequestSchema.parse(args);
-  if (!SlackContext.userClient) {
-    throw new Error('UserToken is required');
-  }
-  const response = await SlackContext.userClient.chat.postMessage({
+  const response = await SlackContext.botClient.chat.postMessage({
     channel: parsedArgs.channel_id,
     thread_ts: parsedArgs.thread_ts,
     text: parsedArgs.text,
@@ -82,10 +76,7 @@ export async function addReactionHandler(args: unknown) {
  */
 export async function getChannelHistoryHandler(args: unknown) {
   const parsedArgs = GetChannelHistoryRequestSchema.parse(args);
-  if (!SlackContext.userClient) {
-    throw new Error('UserToken is required');
-  }
-  const response = await SlackContext.userClient.conversations.history({
+  const response = await SlackContext.botClient.conversations.history({
     channel: parsedArgs.channel_id,
     limit: parsedArgs.limit,
     cursor: parsedArgs.cursor,
