@@ -1,4 +1,4 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,
   PutCommand,
@@ -12,9 +12,20 @@ export class DynamoDBInstallationRepository implements IInstallationRepo {
   private tableName: string;
 
   constructor(tableName?: string, region?: string) {
-    const dynamoClient = new DynamoDBClient({
+    const clientConfig: DynamoDBClientConfig = {
       region: region || 'ap-northeast-1',
-    });
+    };
+
+    // ローカルDynamoDBエンドポイントが設定されている場合
+    if (process.env.DYNAMODB_ENDPOINT) {
+      clientConfig.endpoint = process.env.DYNAMODB_ENDPOINT;
+      clientConfig.credentials = {
+        accessKeyId: 'dummy',
+        secretAccessKey: 'dummy',
+      };
+    }
+
+    const dynamoClient = new DynamoDBClient(clientConfig);
     this.client = DynamoDBDocumentClient.from(dynamoClient, {
       marshallOptions: {
         removeUndefinedValues: true,
@@ -67,7 +78,6 @@ export class DynamoDBInstallationRepository implements IInstallationRepo {
           Limit: 1,
         })
       );
-
       if (!response.Items || response.Items.length === 0) {
         return null;
       }
