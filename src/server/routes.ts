@@ -57,16 +57,49 @@ export function setupRoutes(
       );
     }
 
+    // Parse request body if it's a Buffer
+    let parsedBody = req.body;
+    if (Buffer.isBuffer(req.body)) {
+      console.log('Request body is Buffer, parsing...');
+      parsedBody = JSON.parse(req.body.toString());
+    } else if (
+      req.body &&
+      typeof req.body === 'object' &&
+      req.body.type === 'Buffer'
+    ) {
+      console.log('Request body is Buffer object, converting...');
+      const buffer = Buffer.from(req.body.data);
+      parsedBody = JSON.parse(buffer.toString());
+    }
+
+    // Debug logging
+    console.log('Parsed request body:', JSON.stringify(parsedBody));
+    console.log('isInitializeRequest result:', isInitializeRequest(parsedBody));
+    console.log('parsedBody type:', typeof parsedBody);
+    console.log('parsedBody method:', parsedBody?.method);
+
     // Check for existing session ID
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
+    console.log('Session ID from headers:', sessionId);
     if (sessionId && transportManager.getTransport(sessionId)) {
       // Reuse existing transport
       const transport = transportManager.getTransport(sessionId)!;
-      await transport.handleRequest(req, res, req.body);
-    } else if (!sessionId && isInitializeRequest(req.body)) {
+      await transport.handleRequest(req, res, parsedBody);
+    } else if (!sessionId && isInitializeRequest(parsedBody)) {
       // New initialization request
+      console.log('Creating new transport for initialize request');
       const transport = await transportManager.createTransport();
-      await transport.handleRequest(req, res, req.body);
+      console.log(
+        'Transport created, handling request with body:',
+        JSON.stringify(parsedBody)
+      );
+      try {
+        await transport.handleRequest(req, res, parsedBody);
+        console.log('Transport handleRequest completed successfully');
+      } catch (error) {
+        console.error('Error in transport.handleRequest:', error);
+        throw error;
+      }
     } else {
       // Invalid request
       res.status(400).json({
