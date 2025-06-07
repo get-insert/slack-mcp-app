@@ -187,21 +187,6 @@ export const GetUserProfileRequestSchema = z.object({
   user_id: z.string().describe('The ID of the user'),
 });
 
-export const ListChannelsRequestSchema = z.object({
-  cursor: z
-    .string()
-    .optional()
-    .describe('Pagination cursor for next page of results'),
-  limit: z
-    .number()
-    .int()
-    .min(1)
-    .max(1000) // Align with Slack API's default limit (conversations.list is actually cursor-based)
-    .optional()
-    .default(100)
-    .describe('Maximum number of channels to return (default 100)'),
-});
-
 export const PostMessageRequestSchema = z.object({
   channel_id: z.string().describe('The ID of the channel to post to'),
   text: z.string().describe('The message text to post'),
@@ -339,10 +324,6 @@ export const GetUsersResponseSchema = BaseResponseSchema.extend({
 
 export const GetUserProfileResponseSchema = BaseResponseSchema.extend({
   profile: ProfileSchema.optional(),
-});
-
-export const ListChannelsResponseSchema = BaseResponseSchema.extend({
-  channels: z.array(ChannelSchema).optional(),
 });
 
 export const SearchMessagesResponseSchema = BaseResponseSchema.extend({

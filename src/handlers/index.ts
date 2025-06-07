@@ -22,7 +22,6 @@ export type ToolHandler = (args: unknown) => Promise<{
 // Mapping tool names to handlers
 export const handlers: Record<string, ToolHandler> = {
   // Channel related
-  slack_list_channels: channelsHandlers.listChannelsHandler,
   slack_get_user_channels: channelsHandlers.getUserChannelsHandler,
 
   // Message related

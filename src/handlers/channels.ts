@@ -1,34 +1,8 @@
 import { SlackContext } from '../config/slack-client.js';
 import {
-  ListChannelsRequestSchema,
-  ListChannelsResponseSchema,
-} from '../schemas.js';
-import {
   GetUserChannelsRequestSchema,
   GetUserChannelsResponseSchema,
 } from '../schemas.js';
-
-/**
- * Handler for retrieving channel list
- */
-export async function listChannelsHandler(args: unknown) {
-  const parsedArgs = ListChannelsRequestSchema.parse(args);
-
-  const response = await SlackContext.botClient.conversations.list({
-    limit: parsedArgs.limit,
-    cursor: parsedArgs.cursor,
-    types: 'public_channel,private_channel', // Include private channels
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to list channels: ${response.error}`);
-  }
-
-  const parsed = ListChannelsResponseSchema.parse(response);
-  return {
-    content: [{ type: 'text', text: JSON.stringify(parsed) }],
-  };
-}
 
 /**
  * Handler for retrieving list of channels the user has joined
@@ -36,7 +10,7 @@ export async function listChannelsHandler(args: unknown) {
 export async function getUserChannelsHandler(args: unknown) {
   const parsedArgs = GetUserChannelsRequestSchema.parse(args);
 
-  const response = await SlackContext.botClient.users.conversations({
+  const response = await SlackContext.userClient.users.conversations({
     types: 'public_channel,private_channel',
     exclude_archived: true,
     limit: parsedArgs.limit,

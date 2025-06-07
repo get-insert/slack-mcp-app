@@ -16,7 +16,6 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import { z } from 'zod';
 import { handlers } from './handlers/index.js';
 import {
-  ListChannelsRequestSchema,
   PostMessageRequestSchema,
   ReplyToThreadRequestSchema,
   AddReactionRequestSchema,
@@ -54,11 +53,6 @@ function createMCPServer(): Server {
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
       tools: [
-        {
-          name: 'slack_list_channels',
-          description: 'List public channels in the workspace with pagination',
-          inputSchema: zodToJsonSchema(ListChannelsRequestSchema),
-        },
         {
           name: 'slack_post_message',
           description: 'Post a new message to a Slack channel',

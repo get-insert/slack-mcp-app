@@ -10,17 +10,16 @@ import { z } from 'zod';
 import { handlers } from './handlers/index.js';
 import { startServer } from './server/index.js';
 import {
-  ListChannelsRequestSchema,
+  GetUserChannelsRequestSchema,
   PostMessageRequestSchema,
   ReplyToThreadRequestSchema,
   AddReactionRequestSchema,
   GetChannelHistoryRequestSchema,
   GetThreadRepliesRequestSchema,
-  GetUsersRequestSchema,
-  GetUserProfileRequestSchema,
   SearchMessagesRequestSchema,
   SearchMentionsRequestSchema,
-  GetUserChannelsRequestSchema,
+  GetUsersRequestSchema,
+  GetUserProfileRequestSchema,
   ListFilesInChannelRequestSchema,
   GetFileInfoRequestSchema,
   SummarizeChannelFilesRequestSchema,
@@ -47,11 +46,6 @@ const server = new Server(
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
-      {
-        name: 'slack_list_channels',
-        description: 'List public channels in the workspace with pagination',
-        inputSchema: zodToJsonSchema(ListChannelsRequestSchema),
-      },
       {
         name: 'slack_post_message',
         description: 'Post a new message to a Slack channel',

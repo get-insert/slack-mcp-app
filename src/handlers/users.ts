@@ -50,9 +50,6 @@ export async function getUserProfileHandler(args: unknown) {
  * Handler for retrieving current user information
  */
 export async function getCurrentUserHandler() {
-  if (!SlackContext.userClient) {
-    throw new Error('UserToken is required');
-  }
   const response = await SlackContext.userClient.auth.test();
 
   if (!response.ok) {

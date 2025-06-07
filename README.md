@@ -6,7 +6,6 @@ A [MCP(Model Context Protocol)](https://www.anthropic.com/news/model-context-pro
 
 Available tools:
 
-- `slack_list_channels` - List public channels in the workspace with pagination
 - `slack_get_user_channels` - Get all channels (including private) the user is a member of
 - `slack_post_message` - Post a new message to a Slack channel
 - `slack_reply_to_thread` - Reply to a specific message thread in Slack
@@ -107,7 +106,7 @@ This server adopts the following implementation pattern:
    - Parse response with Zod schema to limit to necessary fields
    - Return as JSON
 
-For example, the `slack_list_channels` implementation parses the request with `ListChannelsRequestSchema`, calls `slackClient.conversations.list`, and returns the response parsed with `ListChannelsResponseSchema`.
+For example, the `slack_get_user_channels` implementation parses the request with `GetUserChannelsRequestSchema`, calls `slackClient.users.conversations` with user token, and returns the response parsed with `GetUserChannelsResponseSchema`.
 
 ## Development
 
