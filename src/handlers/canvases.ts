@@ -158,57 +158,7 @@ export async function getCanvasContentHandler(args: unknown) {
       console.log('No url_private_download available for this Canvas');
     }
 
-    const sectionsAttempt = {
-      attempted: false,
-      success: false,
-      sections: [] as Array<{
-        section_id: string;
-        section_type: string;
-        text?: string;
-      }>,
-      error: null as string | null,
-    };
-
-    try {
-      console.log(
-        `Attempting Canvas sections lookup for: ${parsedArgs.canvas_id}`
-      );
-
-      const sectionsResponse = await SlackContext.userClient.apiCall(
-        'canvases.sections.lookup',
-        {
-          canvas_id: parsedArgs.canvas_id,
-          criteria: {
-            section_types: ['h1', 'h2', 'h3'],
-          },
-        }
-      );
-
-      sectionsAttempt.attempted = true;
-
-      if (sectionsResponse.ok && 'sections' in sectionsResponse) {
-        sectionsAttempt.success = true;
-        sectionsAttempt.sections = sectionsResponse.sections as Array<{
-          section_id: string;
-          section_type: string;
-          text?: string;
-        }>;
-        console.log(`Found ${sectionsAttempt.sections.length} Canvas sections`);
-      } else {
-        sectionsAttempt.error =
-          sectionsResponse.error || 'Unknown sections lookup error';
-        console.warn(`Canvas sections lookup failed: ${sectionsAttempt.error}`);
-      }
-    } catch (sectionsError) {
-      sectionsAttempt.attempted = true;
-      sectionsAttempt.error =
-        sectionsError instanceof Error
-          ? sectionsError.message
-          : 'Unknown sections error';
-      console.error('Canvas sections lookup error:', sectionsError);
-    }
-
-    // Return enhanced Canvas information with download and sections attempts
+    // Return Canvas information with download attempt
     return {
       content: [
         {
@@ -230,12 +180,9 @@ export async function getCanvasContentHandler(args: unknown) {
             },
             content_retrieval: {
               download_attempt: downloadAttempt,
-              sections_attempt: sectionsAttempt,
               summary: downloadAttempt.success
                 ? 'Canvas content successfully retrieved via file download'
-                : sectionsAttempt.success
-                  ? `Canvas structure discovered: ${sectionsAttempt.sections.length} sections found`
-                  : 'Canvas content access limited by Slack API constraints',
+                : 'Canvas content cannot be retrieved - file download failed',
             },
           }),
         },
