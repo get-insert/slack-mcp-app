@@ -3,7 +3,7 @@ import {
   APIGatewayProxyResult,
   Context,
 } from 'aws-lambda';
-import { configure } from '@codegenie/serverless-express';
+import serverless from 'serverless-http';
 import express from 'express';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { TransportManager } from './server/transport.js';
@@ -36,7 +36,7 @@ import {
   GetUserChannelActivityRequestSchema,
 } from './schemas.js';
 
-let serverlessExpressInstance: ReturnType<typeof configure> | undefined;
+let serverlessExpressInstance: ReturnType<typeof serverless> | undefined;
 
 function createMCPServer(): Server {
   const server = new Server(
@@ -215,35 +215,20 @@ export const handler = async (
     if (!serverlessExpressInstance) {
       console.log('Creating new Express app instance');
       const app = createExpressApp();
-      serverlessExpressInstance = configure({ app });
+      serverlessExpressInstance = serverless(app);
       console.log('Express app instance created successfully');
     }
 
     console.log('Processing request with serverless express');
-    return new Promise((resolve, reject) => {
-      if (!serverlessExpressInstance) {
-        const error = new Error('Serverless express instance not initialized');
-        console.error('Serverless express instance error:', error);
-        reject(error);
-        return;
-      }
-      serverlessExpressInstance(
-        event,
-        context,
-        (error: unknown, result: unknown) => {
-          if (error) {
-            console.error('Serverless express execution error:', error);
-            reject(error);
-          } else {
-            console.log(
-              'Request processed successfully, result:',
-              JSON.stringify(result, null, 2)
-            );
-            resolve(result as APIGatewayProxyResult);
-          }
-        }
-      );
-    });
+    const result = await serverlessExpressInstance(event, context);
+    const response = result as APIGatewayProxyResult;
+    console.log(
+      'Request processed successfully, result status:',
+      response.statusCode
+    );
+    console.log('Response headers:', JSON.stringify(response.headers, null, 2));
+    console.log('Response body:', response.body);
+    return response;
   } catch (error) {
     console.error('Lambda handler error:', error);
     return {
