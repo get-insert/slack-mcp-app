@@ -56,7 +56,7 @@ export async function getFileInfoHandler(args: unknown) {
 export async function summarizeChannelFilesHandler(args: unknown) {
   const parsedArgs = SummarizeChannelFilesRequestSchema.parse(args);
 
-  // 1. Get all channels the user is a member of  
+  // 1. Get all channels the user is a member of
   const channelsResponse = await SlackContext.userClient.users.conversations({
     types: parsedArgs.include_private
       ? 'public_channel,private_channel'
