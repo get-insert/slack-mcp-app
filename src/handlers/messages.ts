@@ -76,7 +76,7 @@ export async function addReactionHandler(args: unknown) {
  */
 export async function getChannelHistoryHandler(args: unknown) {
   const parsedArgs = GetChannelHistoryRequestSchema.parse(args);
-  const response = await SlackContext.botClient.conversations.history({
+  const response = await SlackContext.userClient.conversations.history({
     channel: parsedArgs.channel_id,
     limit: parsedArgs.limit,
     cursor: parsedArgs.cursor,
