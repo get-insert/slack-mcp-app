@@ -25,10 +25,12 @@ export function isCanvasFile(file: {
  * @param files - Array of Slack file objects
  * @returns Array of Canvas files only
  */
-export function filterCanvasFiles<T extends {
-  filetype?: string;
-  mode?: string;
-  pretty_type?: string;
-}>(files: T[]): T[] {
+export function filterCanvasFiles<
+  T extends {
+    filetype?: string;
+    mode?: string;
+    pretty_type?: string;
+  },
+>(files: T[]): T[] {
   return files.filter(isCanvasFile);
 }
