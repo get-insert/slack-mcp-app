@@ -97,7 +97,7 @@ export async function getChannelHistoryHandler(args: unknown) {
  */
 export async function getThreadRepliesHandler(args: unknown) {
   const parsedArgs = GetThreadRepliesRequestSchema.parse(args);
-  const response = await SlackContext.botClient.conversations.replies({
+  const response = await SlackContext.userClient.conversations.replies({
     channel: parsedArgs.channel_id,
     ts: parsedArgs.thread_ts,
     limit: parsedArgs.limit,
