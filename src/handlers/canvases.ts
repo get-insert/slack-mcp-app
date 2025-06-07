@@ -4,6 +4,7 @@ import {
   GetCanvasContentRequestSchema,
   SummarizeUserCanvasesRequestSchema,
 } from '../schemas.js';
+import { filterCanvasFiles } from '../utils/canvas.js';
 
 /**
  * Handler for retrieving canvas list in a channel
@@ -12,11 +13,7 @@ export async function listChannelCanvasesHandler(args: unknown) {
   const parsedArgs = ListChannelCanvasesRequestSchema.parse(args);
 
   try {
-    // Method 1: Try conversations.canvases.list API (new API)
     try {
-      console.log(
-        `Trying conversations.canvases.list for channel ${parsedArgs.channel_id}`
-      );
       const canvasResponse = await SlackContext.userClient.apiCall(
         'conversations.canvases.list',
         {
@@ -27,140 +24,42 @@ export async function listChannelCanvasesHandler(args: unknown) {
       );
 
       if (canvasResponse.ok) {
-        console.log(
-          'Successfully retrieved canvases using conversations.canvases.list'
-        );
         return {
           content: [{ type: 'text', text: JSON.stringify(canvasResponse) }],
         };
-      } else {
-        console.warn(
-          `conversations.canvases.list failed with error: ${canvasResponse.error}`
-        );
       }
     } catch (apiError) {
-      console.warn('Error using conversations.canvases.list:', apiError);
+      console.warn('conversations.canvases.list not available:', apiError);
     }
 
-    // Method 2: Use regular files.list API
+    // Fallback to files.list API
     const filesResponse = await SlackContext.userClient.files.list({
       channel: parsedArgs.channel_id,
-      types: 'all', // Get all types and filter later
+      types: 'all',
       count: parsedArgs.limit || 100,
       page: parsedArgs.cursor ? parseInt(parsedArgs.cursor) : 1,
     });
-
-    console.log('Method 2 response:', JSON.stringify(filesResponse));
 
     if (!filesResponse.ok) {
       throw new Error(`Failed to get channel files: ${filesResponse.error}`);
     }
 
-    console.log(
-      `Files found in channel ${parsedArgs.channel_id}:`,
-      filesResponse.files ? filesResponse.files.length : 0
-    );
-
-    // Display file type list (for debugging)
-    if (filesResponse.files && filesResponse.files.length > 0) {
-      console.log(
-        'File types:',
-        filesResponse.files.map((f) => ({
-          id: f.id,
-          name: f.name,
-          type: f.filetype,
-          mode: f.mode,
-          mimetype: f.mimetype,
-        }))
-      );
-
-      // Filter canvas files only (try multiple conditions)
-      const canvasFiles = filesResponse.files.filter((file) => {
-        const isCanvas =
-          file.filetype === 'canvas' ||
-          file.mode === 'canvas' ||
-          file.pretty_type === 'canvas' ||
-          file.filetype === 'quip' ||
-          (file.mimetype && file.mimetype.includes('canvas')) ||
-          (file.name && file.name.toLowerCase().includes('canvas'));
-
-        if (isCanvas) {
-          console.log('Found canvas:', file.id, file.name);
-        }
-
-        return isCanvas;
-      });
-
-      console.log(`Canvases found after filtering: ${canvasFiles.length}`);
-
-      // Return filtered file list
+    if (!filesResponse.files || filesResponse.files.length === 0) {
       return {
         content: [
           {
             type: 'text',
             text: JSON.stringify({
               ok: true,
-              files: canvasFiles,
-              total: canvasFiles.length,
+              message: 'No files found in channel',
+              files: [],
             }),
           },
         ],
       };
     }
 
-    // Method 3: Try direct API call
-    try {
-      console.log(
-        `Trying direct API call for files.list in channel ${parsedArgs.channel_id}`
-      );
-      const directResponse = await SlackContext.userClient.apiCall(
-        'files.list',
-        {
-          channel: parsedArgs.channel_id,
-          count: 100,
-        }
-      );
-
-      console.log('Method 3 response:', JSON.stringify(directResponse));
-
-      if (
-        directResponse.ok &&
-        'files' in directResponse &&
-        Array.isArray(directResponse.files)
-      ) {
-        console.log(
-          `Total files from direct API: ${directResponse.files.length}`
-        );
-
-        // Display sample file information
-        if (directResponse.files.length > 0) {
-          const fileSamples = directResponse.files
-            .slice(0, 5)
-            .map(
-              (f: {
-                id: string;
-                name?: string;
-                title?: string;
-                filetype?: string;
-                mode?: string;
-                created?: number;
-                timestamp?: number;
-              }) => ({
-                id: f.id,
-                name: f.name,
-                title: f.title,
-                filetype: f.filetype,
-                mode: f.mode,
-                created: f.created,
-                timestamp: f.timestamp,
-              })
-            );
-          console.log('File samples:', fileSamples);
-        }
-      }
-    } catch (apiError) {
-      console.warn('Error in direct API call:', apiError);
-    }
+    const canvasFiles = filterCanvasFiles(filesResponse.files);
 
     return {
       content: [
@@ -168,8 +67,8 @@ export async function listChannelCanvasesHandler(args: unknown) {
           type: 'text',
           text: JSON.stringify({
             ok: true,
-            message: 'No canvases found',
-            files: [],
+            files: canvasFiles,
+            total: canvasFiles.length,
           }),
         },
       ],
@@ -183,13 +82,13 @@ export async function listChannelCanvasesHandler(args: unknown) {
 }
 
 /**
- * Handler for retrieving canvas content
+ * Handler for retrieving canvas content with enhanced access attempts
  */
 export async function getCanvasContentHandler(args: unknown) {
   const parsedArgs = GetCanvasContentRequestSchema.parse(args);
 
   try {
-    console.log(`Getting basic info for canvas ID: ${parsedArgs.canvas_id}`);
+    console.log(`Getting enhanced info for canvas ID: ${parsedArgs.canvas_id}`);
 
     // Get basic information for specific canvas
     const response = await SlackContext.userClient.files.info({
@@ -205,7 +104,61 @@ export async function getCanvasContentHandler(args: unknown) {
       throw new Error('Canvas file information not found');
     }
 
-    // Return basic information only
+    const downloadAttempt = {
+      attempted: false,
+      success: false,
+      content: null as string | null,
+      contentType: null as string | null,
+      error: null as string | null,
+      downloadUrl: null as string | null,
+    };
+
+    if (file.url_private_download) {
+      downloadAttempt.attempted = true;
+      downloadAttempt.downloadUrl = file.url_private_download;
+
+      try {
+        console.log(
+          `Attempting Canvas content download from: ${file.url_private_download}`
+        );
+
+        const downloadResponse = await fetch(file.url_private_download, {
+          headers: {
+            Authorization: `Bearer ${SlackContext.userClient.token}`,
+            'User-Agent': 'slack-mcp-server/1.0',
+          },
+        });
+
+        if (downloadResponse.ok) {
+          const contentType =
+            downloadResponse.headers.get('content-type') || 'unknown';
+          downloadAttempt.contentType = contentType;
+
+          console.log(`Download successful. Content-Type: ${contentType}`);
+
+          const content = await downloadResponse.text();
+          downloadAttempt.content = content;
+          downloadAttempt.success = true;
+
+          console.log(
+            `Canvas content retrieved successfully. Length: ${content.length} characters`
+          );
+        } else {
+          downloadAttempt.error = `HTTP ${downloadResponse.status}: ${downloadResponse.statusText}`;
+          console.warn(`Canvas download failed: ${downloadAttempt.error}`);
+        }
+      } catch (downloadError) {
+        downloadAttempt.error =
+          downloadError instanceof Error
+            ? downloadError.message
+            : 'Unknown download error';
+        console.error('Canvas download error:', downloadError);
+      }
+    } else {
+      console.log('No url_private_download available for this Canvas');
+    }
+
+    // Return Canvas information with download attempt
     return {
       content: [
         {
@@ -224,8 +177,12 @@ export async function getCanvasContentHandler(args: unknown) {
               mimetype: file.mimetype || '',
               size: file.size || 0,
               is_editable: file.editable || false,
-              message:
-                'Note: Due to Slack API limitations, canvas content cannot be directly retrieved.',
+            },
+            content_retrieval: {
+              download_attempt: downloadAttempt,
+              summary: downloadAttempt.success
+                ? 'Canvas content successfully retrieved via file download'
+                : 'Canvas content cannot be retrieved - file download failed',
             },
           }),
         },
@@ -294,14 +251,7 @@ export async function summarizeUserCanvasesHandler(args: unknown) {
           continue; // Skip this channel
         }
 
-        // Filter canvas files only
-        const canvasFiles = filesResponse.files.filter(
-          (file) =>
-            file.filetype === 'canvas' ||
-            file.mode === 'canvas' ||
-            file.pretty_type === 'canvas' ||
-            file.filetype === 'quip'
-        );
+        const canvasFiles = filterCanvasFiles(filesResponse.files);
 
         if (canvasFiles.length === 0) {
           continue; // Skip if no canvases
