@@ -11,7 +11,7 @@ export function createSlackApp(receiver?: Receiver) {
   app.event('app_mention', async ({ event, say }) => {
     try {
       const query = event.text.replace(/<@[^>]+>/g, '').trim();
-      
+
       if (!query) {
         await say('こんにちは！何かお手伝いできることはありますか？');
         return;
