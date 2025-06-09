@@ -95,6 +95,8 @@ Resources:
           SLACK_BOT_TOKEN: !Ref SlackBotToken
           SLACK_SIGNING_SECRET: !Ref SlackSigningSecret
           OPENAI_API_KEY: !Ref OpenAIApiKey
+          OPENAI_MODEL: gpt-4o
+          OPENAI_MAX_TOKENS: 4096
           MCP_SERVER_URL: !Sub "https://${AWS::StackName}-api.execute-api.${AWS::Region}.amazonaws.com/Prod/mcp"
       Events:
         SlackEvents:

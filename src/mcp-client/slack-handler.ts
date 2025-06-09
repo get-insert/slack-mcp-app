@@ -1,5 +1,5 @@
 import { App, Receiver } from '@slack/bolt';
-import { processQuery } from './mcp-client.js';
+import { processQuery, cleanupMCPSession } from './mcp-client.js';
 
 export function createSlackApp(receiver?: Receiver) {
   const app = new App({
@@ -22,6 +22,8 @@ export function createSlackApp(receiver?: Receiver) {
     } catch (error) {
       console.error('Error processing app_mention:', error);
       await say('申し訳ございません。エラーが発生しました。');
+    } finally {
+      await cleanupMCPSession();
     }
   });
 
@@ -41,6 +43,8 @@ export function createSlackApp(receiver?: Receiver) {
     } catch (error) {
       console.error('Error processing message:', error);
       await say('申し訳ございません。エラーが発生しました。');
+    } finally {
+      await cleanupMCPSession();
     }
   });
 

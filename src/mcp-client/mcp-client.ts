@@ -4,10 +4,71 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+let sessionId: string | null = null;
+let isInitialized = false;
+
+async function initializeMCPSession(): Promise<void> {
+  if (isInitialized && sessionId) {
+    return;
+  }
+
+  const serverUrl = process.env.MCP_SERVER_URL;
+  if (!serverUrl) {
+    throw new Error('MCP_SERVER_URL environment variable is required');
+  }
+
+  const initResponse = await fetch(serverUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: Date.now(),
+      method: 'initialize',
+      params: {
+        protocolVersion: '2024-11-05',
+        capabilities: {
+          tools: {},
+        },
+        clientInfo: {
+          name: 'slack-mcp-client',
+          version: '1.0.0',
+        },
+      },
+    }),
+  });
+
+  if (!initResponse.ok) {
+    throw new Error(
+      `HTTP error during initialize! status: ${initResponse.status}`
+    );
+  }
+
+  const initResult = (await initResponse.json()) as {
+    error?: { message: string };
+    result?: { sessionId?: string };
+  };
+
+  if (initResult.error) {
+    throw new Error(`MCP Server initialize error: ${initResult.error.message}`);
+  }
+
+  sessionId =
+    initResponse.headers.get('mcp-session-id') ||
+    initResult.result?.sessionId ||
+    `session-${Date.now()}`;
+
+  isInitialized = true;
+  console.log(`MCP session initialized with ID: ${sessionId}`);
+}
+
 async function callMCPServer(
   method: string,
   params: Record<string, unknown>
 ): Promise<unknown> {
+  await initializeMCPSession();
+
   const serverUrl = process.env.MCP_SERVER_URL;
   if (!serverUrl) {
     throw new Error('MCP_SERVER_URL environment variable is required');
@@ -17,6 +78,7 @@ async function callMCPServer(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'mcp-session-id': sessionId!,
     },
     body: JSON.stringify({
       jsonrpc: '2.0',
@@ -42,8 +104,33 @@ async function callMCPServer(
   return result.result;
 }
 
+export async function cleanupMCPSession(): Promise<void> {
+  if (!isInitialized || !sessionId) {
+    return;
+  }
+
+  try {
+    const serverUrl = process.env.MCP_SERVER_URL;
+    if (serverUrl) {
+      await fetch(serverUrl, {
+        method: 'DELETE',
+        headers: {
+          'mcp-session-id': sessionId,
+        },
+      });
+    }
+  } catch (error) {
+    console.error('Error cleaning up MCP session:', error);
+  } finally {
+    sessionId = null;
+    isInitialized = false;
+  }
+}
+
 export async function processQuery(query: string): Promise<string> {
   try {
+    await initializeMCPSession();
+
     const toolsResult = (await callMCPServer('tools/list', {})) as {
       tools?: Array<{
         name: string;
@@ -82,11 +169,11 @@ export async function processQuery(query: string): Promise<string> {
 
     while (iteration < maxIterations) {
       const response = await openai.chat.completions.create({
-        model: 'gpt-4',
+        model: process.env.OPENAI_MODEL || 'gpt-4o',
         messages,
         tools: formattedTools.length > 0 ? formattedTools : undefined,
         tool_choice: formattedTools.length > 0 ? 'auto' : undefined,
-        max_tokens: 2000,
+        max_tokens: parseInt(process.env.OPENAI_MAX_TOKENS || '4096'),
       });
 
       const choice = response.choices[0];
@@ -131,7 +218,7 @@ export async function processQuery(query: string): Promise<string> {
     }
 
     const finalResponse = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: process.env.OPENAI_MODEL || 'gpt-4o',
       messages: [
         ...messages,
         {
@@ -139,7 +226,7 @@ export async function processQuery(query: string): Promise<string> {
           content: `これまでに収集した情報を基に、質問「${query}」に対する最終的な回答をまとめてください。`,
         },
       ],
-      max_tokens: 2000,
+      max_tokens: parseInt(process.env.OPENAI_MAX_TOKENS || '4096'),
     });
 
     return (
