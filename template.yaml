@@ -95,7 +95,7 @@ Resources:
           SLACK_BOT_TOKEN: !Ref SlackBotToken
           SLACK_SIGNING_SECRET: !Ref SlackSigningSecret
           OPENAI_API_KEY: !Ref OpenAIApiKey
-          MCP_SERVER_URL: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/mcp"
+          MCP_SERVER_URL: !Sub "https://${AWS::StackName}-api.execute-api.${AWS::Region}.amazonaws.com/Prod/mcp"
       Events:
         SlackEvents:
           Type: Api
