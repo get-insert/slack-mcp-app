@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/mcp-client",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@types/*": ["../@types/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "../@types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "../../dist"
+  ]
+} 

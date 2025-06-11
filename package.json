@@ -1,23 +1,27 @@
 {
   "name": "@get-insert/slack-mcp-server",
   "version": "0.0.4",
-  "description": "A Slack MCP server",
-  "main": "dist/mcp-server/index.js",
+  "description": "A Slack MCP server workspace",
   "type": "module",
-  "bin": {
-    "slack-mcp-server": "dist/mcp-server/index.js"
-  },
+  "workspaces": [
+    "workspaces/*"
+  ],
   "scripts": {
-    "dev": "node --import ./ts-node-loader.js src/mcp-server/index.ts",
-    "build": "tsc -p tsconfig.build.json && shx chmod +x dist/**/*.js",
-    "start": "node dist/mcp-server/index.js",
+    "dev:server": "MCP_SERVER_PORT=3001 node --import ./ts-node-loader.js workspaces/mcp-server/index.ts",
+    "dev:client": "MCP_CLIENT_PORT=3002 node --import ./ts-node-loader.js workspaces/mcp-client/index.ts",
+    "build": "npm run build:clean && npm run build:server && npm run build:client",
+    "build:clean": "shx rm -rf dist",
+    "build:server": "cd workspaces/mcp-server && tsc -p tsconfig.json && shx chmod +x ../../dist/mcp-server/**/*.js",
+    "build:client": "cd workspaces/mcp-client && tsc -p tsconfig.json && shx chmod +x ../../dist/mcp-client/**/*.js",
+    "start:server": "MCP_SERVER_PORT=3001 node dist/mcp-server/index.js",
+    "start:client": "MCP_CLIENT_PORT=3002 node dist/mcp-client/index.js",
     "test": "echo \"No tests yet\"",
     "lint": "npm run lint:eslint && npm run lint:prettier",
-    "lint:eslint": "eslint \"src/**/*.ts\"",
-    "lint:prettier": "prettier --check \"src/**/*.ts\"",
+    "lint:eslint": "eslint \"workspaces/**/*.ts\"",
+    "lint:prettier": "prettier --check \"workspaces/**/*.ts\"",
     "fix": "npm run fix:eslint && npm run fix:prettier",
-    "fix:eslint": "eslint \"src/**/*.ts\" --fix",
-    "fix:prettier": "prettier --write \"src/**/*.ts\"",
+    "fix:eslint": "eslint \"workspaces/**/*.ts\" --fix",
+    "fix:prettier": "prettier --write \"workspaces/**/*.ts\"",
     "prepublishOnly": "npm run build",
     "local:db:start": "docker-compose up -d dynamodb-local",
     "local:db:stop": "docker-compose stop dynamodb-local",
@@ -26,7 +30,8 @@
   },
   "keywords": [
     "mcp",
-    "slack"
+    "slack",
+    "workspace"
   ],
   "author": "Ubie, Inc.",
   "repository": {
@@ -38,34 +43,18 @@
     "url": "https://github.com/get-insert/slack-mcp-app/issues"
   },
   "license": "Apache-2.0",
-  "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.823.0",
-    "@aws-sdk/lib-dynamodb": "^3.823.0",
-    "@modelcontextprotocol/sdk": "^1.0.4",
-    "@slack/bolt": "^3.22.0",
-    "@slack/web-api": "^7.9.1",
-    "@types/aws-lambda": "^8.10.149",
-    "@types/express": "^5.0.1",
-    "@types/node": "^20.10.3",
-    "axios": "^1.9.0",
-    "dotenv": "^16.4.7",
-    "express": "^5.1.0",
-    "openai": "^4.104.0",
-    "serverless-http": "^3.2.0",
-    "typescript": "^5.3.2",
-    "zod": "^3.22.4",
-    "zod-to-json-schema": "^3.22.4"
-  },
   "devDependencies": {
     "@eslint/js": "^9.24.0",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
+    "concurrently": "^8.2.2",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^16.0.0",
     "prettier": "^3.2.2",
     "shx": "^0.3.4",
     "ts-node": "^10.9.2",
+    "typescript": "^5.3.2",
     "typescript-eslint": "^8.29.1"
   }
 }

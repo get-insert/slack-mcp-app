@@ -1,0 +1,19 @@
+{
+  "name": "@get-insert/mcp-client",
+  "version": "0.0.4",
+  "description": "MCP Client component",
+  "main": "../../dist/mcp-client/index.js",
+  "type": "module",
+  "bin": {
+    "mcp-client": "../../dist/mcp-client/index.js"
+  },
+  "dependencies": {
+    "@slack/bolt": "^3.22.0",
+    "openai": "^4.104.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.3",
+    "typescript": "^5.3.2",
+    "shx": "^0.3.4"
+  }
+} 
