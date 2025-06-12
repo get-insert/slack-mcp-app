@@ -18,6 +18,14 @@ Parameters:
     Type: String
     Description: Slack Signing Secret for request verification
     NoEcho: true
+  SlackBotToken:
+    Type: String
+    Description: Slack Bot Token for MCP Client
+    NoEcho: true
+  OpenAIApiKey:
+    Type: String
+    Description: OpenAI API Key
+    NoEcho: true
 
 Resources:
   SlackInstallationsTable:
@@ -46,7 +54,7 @@ Resources:
   SlackMCPServerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: dist/lambda-entry.handler
+      Handler: dist/mcp-server/lambda-entry.handler
       Runtime: nodejs20.x
       Architectures:
         - arm64
@@ -72,9 +80,40 @@ Resources:
             Path: /{proxy+}
             Method: ANY
 
+  SlackMCPClientFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/mcp-client/lambda-entry.handler
+      Runtime: nodejs20.x
+      Architectures:
+        - arm64
+      MemorySize: 512
+      Timeout: 30
+      Description: Slack MCP Client for webhook processing
+      Environment:
+        Variables:
+          SLACK_BOT_TOKEN: !Ref SlackBotToken
+          SLACK_SIGNING_SECRET: !Ref SlackSigningSecret
+          OPENAI_API_KEY: !Ref OpenAIApiKey
+          OPENAI_MODEL: gpt-4o
+          OPENAI_MAX_TOKENS: 4096
+          MCP_SERVER_URL: !Sub "https://${AWS::StackName}-api.execute-api.${AWS::Region}.amazonaws.com/Prod/mcp"
+      Events:
+        SlackEvents:
+          Type: Api
+          Properties:
+            Path: /slack/events
+            Method: POST
+
 Outputs:
   SlackMCPServerEndpoint:
     Description: "API Gateway endpoint URL for Slack MCP Server"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
     Export:
       Name: !Sub "${AWS::StackName}-SlackMCPServerEndpoint"
+  
+  SlackMCPClientEndpoint:
+    Description: "API Gateway endpoint URL for Slack MCP Client webhook"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/slack/events"
+    Export:
+      Name: !Sub "${AWS::StackName}-SlackMCPClientEndpoint"
